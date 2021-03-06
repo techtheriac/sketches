@@ -63,7 +63,10 @@ const sketch = ({ context }) => {
   moonMesh.position.set(1.5, 1, 0);
   moonMesh.scale.setScalar(0.2);
   moonGroup.add(moonMesh);
+  scene.add(moonGroup);
 
+  const light = new THREE.PointLight("white", 1);
+  scene.add(light);
   // draw each frame
   return {
     // Handle resize events here
@@ -73,11 +76,13 @@ const sketch = ({ context }) => {
       camera.aspect = viewportWidth / viewportHeight;
       camera.updateProjectionMatrix();
     },
+
     // Update & render your scene here
     render({ time }) {
       // note that time is a property from canvas sketch
       earthMesh.rotation.y = time * 0.5;
       moonMesh.rotation.y = time * 0.1;
+      moonGroup.rotation.y = time * 0.5;
       controls.update();
       renderer.render(scene, camera);
     },
