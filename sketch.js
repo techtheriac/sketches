@@ -62,7 +62,7 @@ const sketch = ({ context }) => {
   const moonMesh = new THREE.Mesh(geometry, moonMaterial);
   moonMesh.position.set(1.5, 1, 0);
   moonMesh.scale.setScalar(0.2);
-  scene.add(moonMesh);
+  moonGroup.add(moonMesh);
 
   // draw each frame
   return {
