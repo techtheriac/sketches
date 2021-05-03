@@ -43,14 +43,18 @@ const sketch = ({ context }) => {
 
   // Material can be characterised by texture
   // Setup a material
-  const earthMaterial = new THREE.MeshBasicMaterial({
+  const earthMaterial = new THREE.MeshStandardMaterial({
+    roughness: 1,
+    metalness: 0,
     map: earthTexture,
   });
 
   // defining group - thinking of it as wrapping dom elemenets in a div
   const moonGroup = new THREE.Group();
   // Moon material
-  const moonMaterial = new THREE.MeshBasicMaterial({
+  const moonMaterial = new THREE.MeshStandardMaterial({
+    roughness: 1,
+    metalness: 0,
     map: moonTexture,
   });
 
@@ -65,8 +69,16 @@ const sketch = ({ context }) => {
   moonGroup.add(moonMesh);
   scene.add(moonGroup);
 
-  const light = new THREE.PointLight("white", 1);
+  const light = new THREE.PointLight("white", 3);
   scene.add(light);
+  light.position.set(0, 2, 0);
+
+  //Helper to visualize light position
+  scene.add(new THREE.PointLightHelper(light, 0.1));
+
+  //Helper - scene grid visualizer
+  // scene.add(new THREE.GridHelper(5, 20));
+
   // draw each frame
   return {
     // Handle resize events here
