@@ -11,7 +11,15 @@ const settings = {
   animate: true,
   // Get a WebGL canvas rather than 2D
   context: "webgl",
+  pixelsPerInch: 300,
+  dimensions: "A4",
+  units: "in",
 };
+
+// Load Shaders
+
+const fragmentShader = require("./shader/fragment.glsl");
+const vertexShader = require("./shader/vertex.glsl");
 
 const sketch = ({ context }) => {
   // Create a renderer
@@ -25,6 +33,7 @@ const sketch = ({ context }) => {
   // Setup a camera
   const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 100);
   camera.position.set(3, 3, -5);
+  //camera.position.set(3);
   camera.lookAt(new THREE.Vector3());
 
   // Setup camera controller
@@ -34,50 +43,31 @@ const sketch = ({ context }) => {
   const scene = new THREE.Scene();
 
   // Setup a geometry
-  const geometry = new THREE.SphereGeometry(1, 32, 16);
+  // const geometry = new THREE.SphereGeometry(1, 32, 16);
+  const geometry = new THREE.PlaneBufferGeometry(4, 4, 150, 150);
 
   const loader = new THREE.TextureLoader();
-
-  const earthTexture = loader.load("earth.jpg");
-  const moonTexture = loader.load("moon.jpg");
+  const metalTexture = loader.load("city_scape.jpg");
 
   // Material can be characterised by texture
   // Setup a material
-  const earthMaterial = new THREE.MeshStandardMaterial({
-    roughness: 1,
-    metalness: 0,
-    map: earthTexture,
+  const metalMaterial = new THREE.ShaderMaterial({
+    uniforms: {
+      time: { value: 0 },
+      metalTexture: { value: metalTexture },
+    },
+    side: THREE.DoubleSide,
+    fragmentShader: fragmentShader,
+    vertexShader: vertexShader,
   });
 
-  // defining group - thinking of it as wrapping dom elemenets in a div
-  const moonGroup = new THREE.Group();
-  // Moon material
-  const moonMaterial = new THREE.MeshStandardMaterial({
-    roughness: 1,
-    metalness: 0,
-    map: moonTexture,
-  });
+  const metalMesh = new THREE.Mesh(geometry, metalMaterial);
 
-  // Setup a mesh with geometry + material
-  const earthMesh = new THREE.Mesh(geometry, earthMaterial);
-  scene.add(earthMesh);
-
-  //Set up Moon mesh
-  const moonMesh = new THREE.Mesh(geometry, moonMaterial);
-  moonMesh.position.set(1.5, 1, 0);
-  moonMesh.scale.setScalar(0.2);
-  moonGroup.add(moonMesh);
-  scene.add(moonGroup);
+  scene.add(metalMesh);
 
   const light = new THREE.PointLight("white", 3);
   scene.add(light);
   light.position.set(0, 2, 0);
-
-  //Helper to visualize light position
-  scene.add(new THREE.PointLightHelper(light, 0.1));
-
-  //Helper - scene grid visualizer
-  // scene.add(new THREE.GridHelper(5, 20));
 
   // draw each frame
   return {
@@ -92,9 +82,9 @@ const sketch = ({ context }) => {
     // Update & render your scene here
     render({ time }) {
       // note that time is a property from canvas sketch
-      earthMesh.rotation.y = time * 0.5;
-      moonMesh.rotation.y = time * 0.1;
-      moonGroup.rotation.y = time * 0.5;
+      time += 0.25;
+      metalMaterial.uniforms.time.value = time;
+
       controls.update();
       renderer.render(scene, camera);
     },
